@@ -1,6 +1,6 @@
 ﻿@page "/mailHistory"
 @using MailingProject.Client.ViewModels
-@inject IMailViewModel _mailViewModel
+@inject IMailHistoryViewModel _mailViewModel
 
 <h3>Mail</h3>
 <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0
@@ -69,7 +69,6 @@ else
 
 
 @code {
-
 
     protected override async Task OnInitializedAsync()
     {

@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
-using Shared;
-using System;
+﻿using Shared;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -10,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace MailingProject.Client.ViewModels
 {
-    public class MailViewModel : IMailViewModel
+    public class MailHistoryViewModel : IMailHistoryViewModel
     {
         private HttpClient _httpClient;
         private readonly JsonSerializerOptions _options;
 
-        public MailViewModel(HttpClient httpClient)
+        public MailHistoryViewModel(HttpClient httpClient)
         {
             _httpClient = httpClient;
             _options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };

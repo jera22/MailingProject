@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Service;
 using Shared;
+using System;
 using System.Collections.Generic;
 
 namespace MailingProject.Server.Controllers
@@ -21,9 +22,41 @@ namespace MailingProject.Server.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<MailDTO> Get()
+        public IActionResult GetAllMails()
         {
-            return _mailService.GetMails();
+            try
+            {
+                return Ok(_mailService.GetMails());
+            }
+            catch (System.Exception ex)
+            {
+                logger.LogError(ex.Message);
+
+                throw;
+            }
+            
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult GetMailById([FromRoute] int id)
+        {
+            var mail = _mailService.GetMail(Guid.Parse(id.ToString()));
+            return Ok(mail);
+        }
+
+        [HttpPost]
+        public IActionResult CreateNewMail(MailDTO mail) {
+            try
+            {
+                _mailService.InsertMail(mail);
+                return Created("",mail);
+            }
+            catch (System.Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }
+            
         }
     }
 }

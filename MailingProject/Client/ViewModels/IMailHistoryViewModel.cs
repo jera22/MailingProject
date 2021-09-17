@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace MailingProject.Client.ViewModels
 {
-    public interface IMailViewModel
+    public interface IMailHistoryViewModel
     {
         public IEnumerable<MailDTO> mailCollection { get; set; }
         public Task getAllMails();

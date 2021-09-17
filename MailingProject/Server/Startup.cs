@@ -24,7 +24,6 @@ namespace MailingProject.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddDbContext<ApplicationContext>(options => options.usemysql(Configuration.GetConnectionString("DefaultConnection")));
             string mySqlConnectionStr = Configuration.GetConnectionString("DefaultConnection");
 
             services.AddDbContextPool<ApplicationContext>(options => options.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr)));
