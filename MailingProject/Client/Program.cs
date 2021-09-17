@@ -16,6 +16,7 @@ namespace MailingProject.Client
 
             builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             builder.Services.AddTransient<IMailHistoryViewModel,MailHistoryViewModel>();
+            builder.Services.AddTransient<ISendMailViewModel,SendMailViewModel>();
 
             await builder.Build().RunAsync();
         }

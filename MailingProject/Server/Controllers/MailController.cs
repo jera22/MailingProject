@@ -31,32 +31,75 @@ namespace MailingProject.Server.Controllers
             catch (System.Exception ex)
             {
                 logger.LogError(ex.Message);
-
+                return BadRequest();
                 throw;
             }
-            
         }
 
         [HttpGet("{id}")]
         public IActionResult GetMailById([FromRoute] int id)
         {
-            var mail = _mailService.GetMail(Guid.Parse(id.ToString()));
-            return Ok(mail);
+            try
+            {
+                var mail = _mailService.GetMail(Guid.Parse(id.ToString()));
+                return Ok(mail);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                return BadRequest();
+                throw;
+            }
         }
 
         [HttpPost]
-        public IActionResult CreateNewMail(MailDTO mail) {
+        public IActionResult CreateNewMail(MailDTO mail)
+        {
             try
             {
                 _mailService.InsertMail(mail);
-                return Created("",mail);
+                return Created("", mail);
             }
             catch (System.Exception ex)
             {
                 logger.LogError(ex.Message);
+                return BadRequest();
                 throw;
             }
-            
+
+        }
+
+        [HttpPut]
+        public IActionResult UpdateMail(MailDTO mail)
+        {
+            try
+            {
+                _mailService.UpdateMail(mail);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                return BadRequest();
+                throw;
+            }
+        }
+
+        [HttpDelete]
+        public IActionResult DeleteMail(Guid id)
+        {
+            try
+            {
+                _mailService.DeleteMail(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                return BadRequest();
+                throw;
+            }
+
         }
     }
 }

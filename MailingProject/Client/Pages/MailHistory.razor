@@ -1,6 +1,6 @@
 ﻿@page "/mailHistory"
 @using MailingProject.Client.ViewModels
-@inject IMailHistoryViewModel _mailViewModel
+@inject IMailHistoryViewModel _mailHistoryViewModel
 
 <h3>Mail</h3>
 <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0
@@ -28,7 +28,7 @@
 
 
 
-@if (_mailViewModel.mailCollection.Equals(null))
+@if (_mailHistoryViewModel.mailCollection.Equals(null))
 {
     <p><em>Loading...</em></p>
 }
@@ -45,7 +45,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @if (_mailViewModel.mailCollection == null)
+            @if (_mailHistoryViewModel.mailCollection == null)
             {
                 <tr>
                     <td colspan="3">No Records to display</td>
@@ -53,7 +53,7 @@ else
             }
             else
             {
-                foreach (var mail in _mailViewModel.mailCollection)
+                foreach (var mail in _mailHistoryViewModel.mailCollection)
                 {
                     <tr>
                         <td>@mail.From</td>
@@ -72,6 +72,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await _mailViewModel.getAllMails();
+        await _mailHistoryViewModel.getAllMails();
     }
 }

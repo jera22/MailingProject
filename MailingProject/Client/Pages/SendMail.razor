@@ -1,0 +1,20 @@
+﻿@page "/sendMail"
+@using MailingProject.Client.ViewModels
+@inject ISendMailViewModel _sendMailViewModel
+
+<h3>SendMail</h3>
+
+<EditForm Model="@_sendMailViewModel">
+    DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText id="name" @bind-Value="_sendMailViewModel._mailDTO.From" />
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+
+    
+    
+}
