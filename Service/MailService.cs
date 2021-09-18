@@ -31,18 +31,24 @@ namespace Service
             return _map.Map<IEnumerable<MailDTO>>(_mails);
         }
 
-        public void InsertMail(MailDTO mail)
+        public void InsertMail(MailDTO _mailDTO)
         {
-            _mailRepository.Insert(_map.Map<Mail>(mail));
+            var mail = _map.Map<Mail>(_mailDTO);
+            mail.CreatedOn= DateTime.Now.ToUniversalTime();
+            mail.ModifiedOn= DateTime.Now.ToUniversalTime();
+            _mailRepository.Insert(mail);
         }
 
-        public void UpdateMail(MailDTO mail)
+        public void UpdateMail(MailDTO _mailDTO)
         {
-            _mailRepository.Update(_map.Map<Mail>(mail));
+            var mail = _map.Map<Mail>(_mailDTO);
+            mail.ModifiedOn = DateTime.Now.ToUniversalTime();
+            _mailRepository.Update(mail);
         }
         public void DeleteMail(Guid id)
         {
-            var mail = GetMail(id);
+            var mail = new Mail() { Id = id };
+                       
             _mailRepository.Delete(_map.Map<Mail>(mail));
         }
 

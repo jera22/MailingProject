@@ -85,8 +85,8 @@ namespace MailingProject.Server.Controllers
             }
         }
 
-        [HttpDelete]
-        public IActionResult DeleteMail(Guid id)
+        [HttpDelete("{id}")]
+        public IActionResult DeleteMail([FromRoute]Guid id)
         {
             try
             {

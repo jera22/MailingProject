@@ -26,9 +26,9 @@ namespace MailingProject.Server
         {
             string mySqlConnectionStr = Configuration.GetConnectionString("DefaultConnection");
 
-            services.AddDbContextPool<ApplicationContext>(options => options.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr)));
+            services.AddDbContextFactory<ApplicationContext>(options => options.UseMySql(mySqlConnectionStr, ServerVersion.AutoDetect(mySqlConnectionStr)).EnableSensitiveDataLogging());
             services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             services.AddTransient<IMailService, MailService>();
             services.AddControllersWithViews();
             services.AddRazorPages();

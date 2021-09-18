@@ -1,20 +1,82 @@
 ﻿@page "/sendMail"
+@using MailingProject.Client.Components
 @using MailingProject.Client.ViewModels
+@using global::Shared
 @inject ISendMailViewModel _sendMailViewModel
 
-<h3>SendMail</h3>
+<h3>Send Mail</h3>
 
-<EditForm Model="@_sendMailViewModel">
-    DataAnnotationsValidator />
-    <ValidationSummary />
+<EditForm Model="@_sendMailViewModel._mailDTO" OnValidSubmit="@OpenDialog">
+    <DataAnnotationsValidator />
+    <div class="col-12 row">
+        <label class="col-12 font-weight-bold" for>From:</label>
+        <InputText id="From" class="form-control col-3" @bind-Value="_sendMailViewModel._mailDTO.From" />
+        &nbsp;<ValidationMessage For="@(()=>_sendMailViewModel._mailDTO.From)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-12 font-weight-bold">To:</label>
+        <InputText id="To" class="form-control col-3" @bind-Value="_sendMailViewModel._mailDTO.To" />
+        &nbsp;<ValidationMessage For="@(()=>_sendMailViewModel._mailDTO.To)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-12 font-weight-bold">CC:</label>
+        <InputText id="CC" class="form-control col-3" @bind-Value="_sendMailViewModel._mailDTO.CC" />
+        &nbsp;<ValidationMessage For="@(()=>_sendMailViewModel._mailDTO.CC)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-12 font-weight-bold">Subject:</label>
+        <InputText id="Subject" class="form-control col-3" @bind-Value="_sendMailViewModel._mailDTO.Subject" />
+        &nbsp;<ValidationMessage For="@(()=>_sendMailViewModel._mailDTO.Subject)" />
+    </div>
+    <div class="col-12 row">
+        <label class="col-12 font-weight-bold">Importance:</label>
+        <InputSelect id="Importance" class="form-control col-3" @bind-Value="_sendMailViewModel._mailDTO.Importance">
 
-    <InputText id="name" @bind-Value="_sendMailViewModel._mailDTO.From" />
+            @foreach (var importance in Enum.GetValues(typeof(ImportanceEnum)))
+            {
 
-    <button type="submit">Submit</button>
+                <option value="@importance">@importance</option>
+            }
+        </InputSelect>
+    </div>
+    <div class="col-12 row">
+        <label class="col-12 font-weight-bold">Description:</label>
+        <InputTextArea id="Body" class="form-control" @bind-Value="_sendMailViewModel._mailDTO.Body" />
+    </div>
+    <button class="btn btn-primary" type="submit">Send</button>
+     <button class="btn" @onclick="@ClearForm">Clear</button>
+
 </EditForm>
-
+@if (ShowModalDialog)
+{
+    <ModalDialog Title="Are you sure?" Text="Do you want to send this email?" OkButton="Send" OkButtonClass="btn btn-primary" OnClose="@OnDialogClose"></ModalDialog>
+}
 @code {
 
-    
-    
+    public bool ShowModalDialog { get; set; } = false;
+
+    public async void OnDialogClose(bool accept)
+    {
+        ShowModalDialog = false;
+        if (accept)
+        {
+            var result =await _sendMailViewModel.SendMail();
+            if (result.IsSuccessStatusCode)
+            {
+                ClearForm();
+            }
+        }
+        StateHasChanged();
+    }
+
+    public void OpenDialog()
+    {
+        ShowModalDialog = true;
+        StateHasChanged();
+    }
+    public void ClearForm()
+    {
+        _sendMailViewModel._mailDTO = new MailDTO();
+    }
+
 }

@@ -1,11 +1,11 @@
 ﻿@page "/mailHistory"
 @using MailingProject.Client.ViewModels
-@inject IMailHistoryViewModel _mailHistoryViewModel
+@using MailingProject.Client.Components
+@using global::Shared
+@inject HttpClient _httpClient
 
 <h3>Mail</h3>
-<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0
-/css/font-awesome.min.css" rel="stylesheet">
-
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <style>
     .sort-th {
         cursor: pointer;
@@ -28,7 +28,7 @@
 
 
 
-@if (_mailHistoryViewModel.mailCollection.Equals(null))
+@if (mailCollection.Equals(null))
 {
     <p><em>Loading...</em></p>
 }
@@ -37,15 +37,21 @@ else
     <table class="table table-bordered table-hover">
         <thead>
             <tr>
-                <th class="sort-th"> From  </th>
-                <th class="sort-th"> To </th>
-                <th class="sort-th"> CC </th>
-                <th class="sort-th"> Subject </th>
+                <th class="sort-th" @onclick="@(() => SortTable("From"))"> From 
+                     <span class="fa @(SetSortIcon("From"))"></span></th>
+               <th class="sort-th" @onclick="@(() => SortTable("To"))"> To 
+                     <span class="fa @(SetSortIcon("To"))"></span></th>
+                <th class="sort-th" @onclick="@(() => SortTable("CC"))"> CC 
+                     <span class="fa @(SetSortIcon("CC"))"></span></th>
+                <th class="sort-th" @onclick="@(() => SortTable("Subject"))"> Subject 
+                     <span class="fa @(SetSortIcon("Subject"))"></span></th>
+
+                <th>Body</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
-            @if (_mailHistoryViewModel.mailCollection == null)
+            @if (mailCollection == null)
             {
                 <tr>
                     <td colspan="3">No Records to display</td>
@@ -53,25 +59,113 @@ else
             }
             else
             {
-                foreach (var mail in _mailHistoryViewModel.mailCollection)
+                foreach (var mail in mailCollection)
                 {
                     <tr>
                         <td>@mail.From</td>
                         <td>@mail.To</td>
                         <td>@mail.CC</td>
                         <td>@mail.Subject</td>
+                        <td>@mail.Body</td>
+                        <td>
+                            <button class="btn btn-danger" @onclick="() => OpenDialog(mail.Id)"> Delete </button>
+                        </td>
                     </tr>
                 }
             }
         </tbody>
     </table>
 }
+@if (ShowModalDialog)
+{
+    <ModalDialog Title="Are you sure?" Text="Do you want to delete this email?" OkButton="Delete" OkButtonClass="btn btn-danger" OnClose="@OnDialogClose"></ModalDialog>
+}
+
 
 
 @code {
 
+    public bool ShowModalDialog { get; set; } = false;
+    private bool isSortedAscending;
+    private string activeSortColumn;
+
     protected override async Task OnInitializedAsync()
     {
-        await _mailHistoryViewModel.getAllMails();
+        await getAllMails();
+
+    }
+    private Guid idToPass;
+
+    public async void OnDialogClose(bool accept)
+    {
+        ShowModalDialog = false;
+        if (accept)
+        {
+            await deleteMailById(idToPass);
+        }
+        StateHasChanged();
+    }
+
+    public void OpenDialog(Guid id)
+    {
+        ShowModalDialog = true;
+        idToPass = id;
+        StateHasChanged();
+
+    }
+
+    public List<MailDTO> mailCollection { get; set; } = new List<MailDTO>();
+
+    public async Task getAllMails()
+    {
+        mailCollection = await _httpClient.GetFromJsonAsync<List<MailDTO>>("/mail");
+    }
+
+    public async Task deleteMailById(Guid id)
+    {
+        var result = await _httpClient.DeleteAsync("/mail/" + id.ToString());
+        if (result != null && result.IsSuccessStatusCode)
+        {
+            mailCollection.RemoveAll(x => x.Id == id);
+        }
+    }
+    private void SortTable(string columnName)
+    {
+        if (columnName != activeSortColumn)
+        {
+            mailCollection = mailCollection.OrderBy(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
+            isSortedAscending = true;
+            activeSortColumn = columnName;
+
+        }
+        else
+        {
+            if (isSortedAscending)
+            {
+                mailCollection = mailCollection.OrderByDescending(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
+            }
+            else
+            {
+                mailCollection = mailCollection.OrderBy(x => x.GetType().GetProperty(columnName).GetValue(x, null)).ToList();
+            }
+
+            isSortedAscending = !isSortedAscending;
+        }
+    }
+
+    private string SetSortIcon(string columnName)
+    {
+        if (activeSortColumn != columnName)
+        {
+            return string.Empty;
+        }
+        if (isSortedAscending)
+        {
+            return "fa-sort-up";
+        }
+        else
+        {
+            return "fa-sort-down";
+        }
     }
 }

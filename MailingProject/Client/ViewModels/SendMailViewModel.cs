@@ -1,7 +1,5 @@
 ﻿using Shared;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 
@@ -20,11 +18,12 @@ namespace MailingProject.Client.ViewModels
             _httpClient = httpClient;
         }
 
-        public async Task SendMail()
+        public async Task<HttpResponseMessage> SendMail()
         {
             try
             {
-                await _httpClient.PostAsJsonAsync("/ mail", _mailDTO);
+              var result = await _httpClient.PostAsJsonAsync("/mail", _mailDTO);
+                return result;
             }
             catch (Exception)
             {
@@ -32,6 +31,11 @@ namespace MailingProject.Client.ViewModels
                 throw;
             }
             
+        }
+
+        public void CheckFields()
+        {
+            throw new NotImplementedException();
         }
     }
 }

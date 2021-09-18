@@ -9,13 +9,17 @@ namespace Repository
     public class Repository<T> : IRepository<T> where T : BaseEntity
     {
         private readonly ApplicationContext context;
+        private IDbContextFactory<ApplicationContext> _DbFactory;
         private DbSet<T> entities;
         string errorMessage = string.Empty;
 
-        public Repository(ApplicationContext context)
+        public Repository(IDbContextFactory<ApplicationContext> DbFactory)
         {
-            this.context = context;
+            _DbFactory = DbFactory;
+            this.context = _DbFactory.CreateDbContext();
+
             entities = context.Set<T>();
+
         }
         public IEnumerable<T> GetAll()
         {
@@ -24,6 +28,7 @@ namespace Repository
 
         public T Get(Guid id)
         {
+            entities.AsNoTracking();
             return entities.SingleOrDefault(s => s.Id == id);
         }
         public void Insert(T entity)
@@ -46,11 +51,12 @@ namespace Repository
         }
 
         public void Delete(T entity)
-        {
+        { 
             if (entity == null)
             {
                 throw new ArgumentNullException("entity");
             }
+            entities.AsNoTracking<T>();
             entities.Remove(entity);
             context.SaveChanges();
         }
